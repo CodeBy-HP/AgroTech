@@ -1,41 +1,41 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { useAuth } from '@/context/AuthContext';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { useAuth } from "@/context/AuthContext";
 
 export default function RegisterCompany() {
   const router = useRouter();
   const { registerCompany } = useAuth();
   const [formData, setFormData] = useState({
-    username: '',
-    email: '',
-    password: '',
-    full_name: '',
-    mobile_number: '',
-    company_name: '',
-    company_type: '',
-    company_location: '',
-    contact_person_designation: '',
-    company_gst_id: '',
+    username: "",
+    email: "",
+    password: "",
+    full_name: "",
+    mobile_number: "",
+    company_name: "",
+    company_type: "",
+    company_location: "",
+    contact_person_designation: "",
+    company_gst_id: "",
   });
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setLoading(true);
 
     try {
       await registerCompany({
         ...formData,
-        user_type: 'company',
+        user_type: "company",
       });
-      router.push('/login');
+      router.push("/login");
     } catch (err) {
-      setError('Registration failed. Please try again.');
+      setError("Registration failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -43,9 +43,9 @@ export default function RegisterCompany() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -57,8 +57,11 @@ export default function RegisterCompany() {
             Register as a Company
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            Already have an account?{' '}
-            <Link href="/login" className="font-medium text-green-600 hover:text-green-500">
+            Already have an account?{" "}
+            <Link
+              href="/login"
+              className="font-medium text-green-600 hover:text-green-500"
+            >
               Sign in
             </Link>
           </p>
@@ -66,7 +69,10 @@ export default function RegisterCompany() {
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm space-y-4">
             <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="username"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Username
               </label>
               <input
@@ -80,7 +86,10 @@ export default function RegisterCompany() {
               />
             </div>
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Email
               </label>
               <input
@@ -94,7 +103,10 @@ export default function RegisterCompany() {
               />
             </div>
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Password
               </label>
               <input
@@ -108,7 +120,10 @@ export default function RegisterCompany() {
               />
             </div>
             <div>
-              <label htmlFor="full_name" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="full_name"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Contact Person Full Name
               </label>
               <input
@@ -122,7 +137,10 @@ export default function RegisterCompany() {
               />
             </div>
             <div>
-              <label htmlFor="mobile_number" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="mobile_number"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Contact Person Mobile Number
               </label>
               <input
@@ -136,7 +154,10 @@ export default function RegisterCompany() {
               />
             </div>
             <div>
-              <label htmlFor="company_name" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="company_name"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Company Name
               </label>
               <input
@@ -150,14 +171,17 @@ export default function RegisterCompany() {
               />
             </div>
             <div>
-              <label htmlFor="company_type" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="company_type"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Company Type
               </label>
               <select
                 id="company_type"
                 name="company_type"
                 required
-                className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm rounded-md"
+                className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm rounded-md text-gray-900 font-medium"
                 value={formData.company_type}
                 onChange={handleChange}
               >
@@ -169,8 +193,12 @@ export default function RegisterCompany() {
                 <option value="Other">Other</option>
               </select>
             </div>
+
             <div>
-              <label htmlFor="company_location" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="company_location"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Company Location
               </label>
               <input
@@ -184,7 +212,10 @@ export default function RegisterCompany() {
               />
             </div>
             <div>
-              <label htmlFor="contact_person_designation" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="contact_person_designation"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Contact Person Designation
               </label>
               <input
@@ -198,7 +229,10 @@ export default function RegisterCompany() {
               />
             </div>
             <div>
-              <label htmlFor="company_gst_id" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="company_gst_id"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Company GST/Tax ID (Optional)
               </label>
               <input
@@ -213,9 +247,7 @@ export default function RegisterCompany() {
           </div>
 
           {error && (
-            <div className="text-red-500 text-sm text-center">
-              {error}
-            </div>
+            <div className="text-red-500 text-sm text-center">{error}</div>
           )}
 
           <div>
@@ -224,11 +256,11 @@ export default function RegisterCompany() {
               disabled={loading}
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Registering...' : 'Register'}
+              {loading ? "Registering..." : "Register"}
             </button>
           </div>
         </form>
       </div>
     </div>
   );
-} 
+}

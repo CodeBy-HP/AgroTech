@@ -28,6 +28,10 @@ export default function Navbar() {
     };
   }, []);
 
+  const handleLogout = () => {
+    logout();  // Call the logout function
+  };
+
   return (
     <nav className="bg-white shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -83,10 +87,10 @@ export default function Navbar() {
                   Profile
                 </Link>
                 <button
-                  onClick={logout}
+                  onClick={handleLogout}  // Logout handler
                   className="ml-3 px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-green-600"
                 >
-                  Logout
+                  <Link href="/">Logout</Link>  {/* Redirects to home */}
                 </button>
               </>
             )}
@@ -159,10 +163,10 @@ export default function Navbar() {
                   Profile
                 </Link>
                 <button
-                  onClick={logout}
+                  onClick={handleLogout} // Logout handler
                   className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-green-600 hover:bg-gray-50"
                 >
-                  Logout
+                  <Link href="/">Logout</Link>  {/* Redirect to home after logout */}
                 </button>
               </>
             )}
