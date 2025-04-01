@@ -12,8 +12,8 @@ Our Solution
 B2B platform that:
 first important feature(to focus now) -> Connects farmers directly to companies for fair price deals, farmers could search there needed raw material on our website and then we will list the farmers that are looking for buyers to make UI nice we can show the farmers on a nice UI map where company can see the eligible farm lands . when comapany click the farmland we will show full information of the farmland like farmer name, farmland area, crop type , soil type, organic or not, expected harvesting date, contact etc. then company could place a deal for the farmer.
 
-nice to have features -> Uses predictive analytics to advise farmers on what to plant for maximum profit.
-nice to have features -> Auto-matches farmers to government schemes they qualify for.
+other features -> Uses predictive analytics to advise farmers on what to plant for maximum profit.
+other features -> Auto-matches farmers to government schemes they qualify for.
 
 
 lets first talk about auth stuff -> 
