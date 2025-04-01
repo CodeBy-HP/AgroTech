@@ -4,23 +4,22 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 
-export default function FarmerDashboard() {
+export default function CompanyDashboard() {
   const router = useRouter();
   const { user, loading } = useAuth();
   const [stats, setStats] = useState({
     totalDeals: 0,
     activeDeals: 0,
     completedDeals: 0,
-    totalRevenue: 0,
+    totalSpent: 0,
   });
 
   useEffect(() => {
     if (!loading) {
       if (!user) {
         router.push('/login');
-      } else if (user.user_type !== 'farmer') {
-        // Redirect if user is not a farmer
-        router.push('/unauthorized'); // or any other page you'd like to redirect to
+      } else if (user.user_type !== 'company') {
+        router.push('/unauthorized'); // Redirect to an unauthorized page or any other page
       }
     }
   }, [user, loading, router]);
@@ -33,8 +32,8 @@ export default function FarmerDashboard() {
     );
   }
 
-  if (!user || user.user_type !== 'farmer') {
-    return null;
+  if (!user || user.user_type !== 'company') {
+    return null; // Ensure the dashboard does not render if the user is not a company
   }
 
   return (
@@ -43,10 +42,10 @@ export default function FarmerDashboard() {
         {/* Welcome Section */}
         <div className="px-4 py-5 sm:px-0">
           <h1 className="text-3xl font-bold text-gray-900">
-            Welcome back, {user.full_name}!
+            Welcome back, {user.company_name}!
           </h1>
           <p className="mt-1 text-sm text-gray-500">
-            Here's what's happening with your farm today.
+            Here's what's happening with your procurement today.
           </p>
         </div>
 
@@ -129,10 +128,10 @@ export default function FarmerDashboard() {
                 <div className="ml-5 w-0 flex-1">
                   <dl>
                     <dt className="text-sm font-medium text-gray-500 truncate">
-                      Total Revenue
+                      Total Spent
                     </dt>
                     <dd className="text-lg font-medium text-gray-900">
-                      ₹{stats.totalRevenue.toLocaleString()}
+                      ₹{stats.totalSpent.toLocaleString()}
                     </dd>
                   </dl>
                 </div>
@@ -154,7 +153,7 @@ export default function FarmerDashboard() {
                 <div className="px-4 py-4 sm:px-6">
                   <div className="flex items-center justify-between">
                     <p className="text-sm font-medium text-green-600 truncate">
-                      New deal proposal received
+                      New crop listing available
                     </p>
                     <div className="ml-2 flex-shrink-0 flex">
                       <p className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
@@ -173,10 +172,10 @@ export default function FarmerDashboard() {
                     </div>
                     <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
                       <svg className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                       <p>
-                        Food Processing Company
+                        Organic Wheat
                       </p>
                     </div>
                   </div>
@@ -189,50 +188,7 @@ export default function FarmerDashboard() {
 
         {/* Quick Actions */}
         <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <button
-            type="button"
-            className="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-          >
-            <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-            </svg>
-            <span className="mt-2 block text-sm font-medium text-gray-900">
-              Create New Listing
-            </span>
-            <span className="mt-1 block text-sm text-gray-500">
-              List your crops for sale
-            </span>
-          </button>
-
-          <button
-            type="button"
-            className="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-          >
-            <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-            </svg>
-            <span className="mt-2 block text-sm font-medium text-gray-900">
-              View All Deals
-            </span>
-            <span className="mt-1 block text-sm text-gray-500">
-              Check your current deals
-            </span>
-          </button>
-
-          <button
-            type="button"
-            className="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-          >
-            <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h10m-7 4h7" />
-            </svg>
-            <span className="mt-2 block text-sm font-medium text-gray-900">
-              View Sales Reports
-            </span>
-            <span className="mt-1 block text-sm text-gray-500">
-              Your sales and revenue history
-            </span>
-          </button>
+          {/* Your buttons here */}
         </div>
       </div>
     </div>

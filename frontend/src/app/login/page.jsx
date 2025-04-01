@@ -1,13 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 
 export default function Login() {
   const router = useRouter();
-  const { login } = useAuth();
+  const { login, user } = useAuth();
   const [formData, setFormData] = useState({
     username: '',
     password: '',
@@ -22,7 +22,6 @@ export default function Login() {
 
     try {
       await login(formData.username, formData.password);
-      router.push('/dashboard');
     } catch (err) {
       setError('Invalid username or password');
     } finally {
@@ -37,6 +36,17 @@ export default function Login() {
       [name]: value
     }));
   };
+
+  // Redirect user after login based on user type
+  useEffect(() => {
+    if (user) {
+      if (user.user_type === 'farmer') {
+        router.push('/dashboard/farmer');
+      } else if (user.user_type === 'company') {
+        router.push('/dashboard/company');
+      }
+    }
+  }, [user, router]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -109,4 +119,4 @@ export default function Login() {
       </div>
     </div>
   );
-} 
+}
