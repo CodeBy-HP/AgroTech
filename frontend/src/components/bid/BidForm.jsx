@@ -95,8 +95,8 @@ export default function BidForm({ farmId }) {
   // If not logged in or not a company, show a message
   if (!user || user.user_type !== 'company') {
     return (
-      <div className="bg-white p-6 rounded-lg shadow-md">
-        <div className="text-red-600">
+      <div className="bg-gradient-to-br from-green-50 to-white p-8 rounded-xl shadow-lg border border-green-100">
+        <div className="text-red-600 font-medium text-center p-4 bg-red-50 rounded-lg">
           {!user ? 'Not authenticated. Please log in.' : 'You must be a company to access this feature.'}
         </div>
       </div>
@@ -105,9 +105,9 @@ export default function BidForm({ farmId }) {
 
   if (isLoading) {
     return (
-      <div className="bg-white p-6 rounded-lg shadow-md">
+      <div className="bg-gradient-to-br from-green-50 to-white p-8 rounded-xl shadow-lg">
         <div className="flex justify-center items-center h-40">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-green-500"></div>
         </div>
       </div>
     );
@@ -115,8 +115,8 @@ export default function BidForm({ farmId }) {
 
   if (!farm) {
     return (
-      <div className="bg-white p-6 rounded-lg shadow-md">
-        <div className="text-red-600">
+      <div className="bg-gradient-to-br from-green-50 to-white p-8 rounded-xl shadow-lg">
+        <div className="text-red-600 font-medium text-center p-4 bg-red-50 rounded-lg">
           Farm not found or you don't have access to view this farm.
         </div>
       </div>
@@ -124,43 +124,63 @@ export default function BidForm({ farmId }) {
   }
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md">
-      <div className="mb-6">
-        <h2 className="text-xl font-semibold text-gray-900">
-          Place a Bid for {farm.crop_type}
-        </h2>
-        <p className="mt-1 text-sm text-gray-500">
-          Farm Location: {farm.farm_location}
-        </p>
+    <div className="bg-gradient-to-br from-green-50 to-white p-8 rounded-xl shadow-lg border border-green-100">
+      <div className="mb-8">
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-bold text-green-800">
+            Place a Bid
+          </h2>
+          <div className="py-1 px-3 bg-green-100 text-green-800 rounded-full text-sm font-medium">
+            {farm.crop_type}
+          </div>
+        </div>
+        
+        <div className="mt-2 pb-4 border-b border-green-100">
+          <p className="flex items-center text-gray-600">
+            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            </svg>
+            {farm.farm_location}
+          </p>
+        </div>
         
         {farm.min_asking_price && (
-          <div className="mt-4 text-sm text-gray-700">
-            <span className="font-medium">Minimum asking price: </span>
-            {formatCurrency(farm.min_asking_price)}
+          <div className="mt-6 flex items-center justify-between bg-green-50 p-4 rounded-lg">
+            <span className="text-gray-700">Minimum asking price</span>
+            <div className="text-xl font-bold text-green-700">
+              {formatCurrency(farm.min_asking_price)}
+            </div>
           </div>
         )}
       </div>
       
       {error && (
-        <div className="mb-4 p-4 text-red-700 bg-red-100 rounded-md">
+        <div className="mb-6 p-4 text-red-700 bg-red-50 rounded-lg border-l-4 border-red-600 flex items-center">
+          <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
           {error}
         </div>
       )}
       
       {success && (
-        <div className="mb-4 p-4 text-green-700 bg-green-100 rounded-md">
+        <div className="mb-6 p-4 text-green-700 bg-green-50 rounded-lg border-l-4 border-green-600 flex items-center">
+          <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+          </svg>
           {success}
         </div>
       )}
       
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div>
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
           <label htmlFor="bid_amount" className="block text-sm font-medium text-gray-700">
             Your Bid Amount (₹)
           </label>
-          <div className="mt-1 relative rounded-md shadow-sm">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <span className="text-gray-500">₹</span>
+          <div className="mt-2 relative rounded-md">
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <span className="text-green-600 font-medium">₹</span>
             </div>
             <input
               type="number"
@@ -169,35 +189,46 @@ export default function BidForm({ farmId }) {
               step="0.01"
               value={bidAmount}
               onChange={e => setBidAmount(e.target.value)}
-              className="pl-7 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
+              className="pl-8 block w-full py-3 rounded-lg border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 text-lg text-gray-900 font-medium"
               placeholder="0.00"
               required
             />
           </div>
-          <p className="mt-1 text-xs text-gray-500">
-            Enter your bid amount in Indian Rupees (₹).
+          <p className="mt-2 text-sm text-gray-500 flex items-center">
+            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            Enter your bid amount in Indian Rupees (₹)
           </p>
         </div>
         
-        <div className="flex justify-end">
+        <div className="flex justify-end pt-4">
           <button
             type="button"
             onClick={() => router.push(`/dashboard/company/farms/${farmId}`)}
-            className="mr-3 px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+            className="mr-4 px-6 py-3 border border-gray-300 rounded-lg shadow-sm text-base font-medium text-gray-700 bg-white hover:bg-gray-50 transition duration-150"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={loading}
-            className={`px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 ${
+            className={`px-6 py-3 rounded-lg shadow-sm text-base font-medium text-white bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-150 ${
               loading ? 'opacity-75 cursor-not-allowed' : ''
             }`}
           >
-            {loading ? 'Placing Bid...' : 'Place Bid'}
+            {loading ? (
+              <span className="flex items-center">
+                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Placing Bid...
+              </span>
+            ) : 'Place Bid'}
           </button>
         </div>
       </form>
     </div>
   );
-} 
+}
