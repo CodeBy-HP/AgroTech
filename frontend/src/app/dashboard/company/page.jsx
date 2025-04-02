@@ -3,28 +3,59 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import { useFarm } from '@/context/FarmContext';
+import Link from 'next/link';
 
 export default function CompanyDashboard() {
   const router = useRouter();
-  const { user, loading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
+  const { getFarms, getMyBids, loading: farmLoading } = useFarm();
   const [stats, setStats] = useState({
-    totalDeals: 0,
-    activeDeals: 0,
-    completedDeals: 0,
-    totalSpent: 0,
+    availableFarms: 0,
+    totalBids: 0,
+    acceptedBids: 0,
+    pendingBids: 0
   });
 
   useEffect(() => {
-    if (!loading) {
+    if (!authLoading) {
       if (!user) {
         router.push('/login');
       } else if (user.user_type !== 'company') {
         router.push('/unauthorized'); // Redirect to an unauthorized page or any other page
+      } else {
+        loadDashboardData();
       }
     }
-  }, [user, loading, router]);
+  }, [user, authLoading, router]);
 
-  if (loading) {
+  const loadDashboardData = async () => {
+    try {
+      // Get available farms (harvested or growing)
+      const farms = await getFarms();
+      const availableFarms = farms.filter(farm => 
+        farm.farm_status === 'growing' || farm.farm_status === 'harvested'
+      ).length;
+      
+      // Get all bids placed by the company
+      const bids = await getMyBids();
+      
+      // Count bids by status
+      const acceptedBids = bids.filter(bid => bid.status === 'accepted').length;
+      const pendingBids = bids.filter(bid => bid.status === 'pending').length;
+      
+      setStats({
+        availableFarms,
+        totalBids: bids.length,
+        acceptedBids,
+        pendingBids
+      });
+    } catch (error) {
+      console.error("Error loading dashboard data:", error);
+    }
+  };
+
+  if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
@@ -56,16 +87,16 @@ export default function CompanyDashboard() {
               <div className="flex items-center">
                 <div className="flex-shrink-0">
                   <svg className="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
                   </svg>
                 </div>
                 <div className="ml-5 w-0 flex-1">
                   <dl>
                     <dt className="text-sm font-medium text-gray-500 truncate">
-                      Total Deals
+                      Available Farms
                     </dt>
                     <dd className="text-lg font-medium text-gray-900">
-                      {stats.totalDeals}
+                      {stats.availableFarms}
                     </dd>
                   </dl>
                 </div>
@@ -78,16 +109,16 @@ export default function CompanyDashboard() {
               <div className="flex items-center">
                 <div className="flex-shrink-0">
                   <svg className="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                   </svg>
                 </div>
                 <div className="ml-5 w-0 flex-1">
                   <dl>
                     <dt className="text-sm font-medium text-gray-500 truncate">
-                      Active Deals
+                      Total Bids
                     </dt>
                     <dd className="text-lg font-medium text-gray-900">
-                      {stats.activeDeals}
+                      {stats.totalBids}
                     </dd>
                   </dl>
                 </div>
@@ -106,10 +137,10 @@ export default function CompanyDashboard() {
                 <div className="ml-5 w-0 flex-1">
                   <dl>
                     <dt className="text-sm font-medium text-gray-500 truncate">
-                      Completed Deals
+                      Accepted Bids
                     </dt>
                     <dd className="text-lg font-medium text-gray-900">
-                      {stats.completedDeals}
+                      {stats.acceptedBids}
                     </dd>
                   </dl>
                 </div>
@@ -122,16 +153,16 @@ export default function CompanyDashboard() {
               <div className="flex items-center">
                 <div className="flex-shrink-0">
                   <svg className="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                   </svg>
                 </div>
                 <div className="ml-5 w-0 flex-1">
                   <dl>
                     <dt className="text-sm font-medium text-gray-500 truncate">
-                      Total Spent
+                      Pending Bids
                     </dt>
                     <dd className="text-lg font-medium text-gray-900">
-                      ₹{stats.totalSpent.toLocaleString()}
+                      {stats.pendingBids}
                     </dd>
                   </dl>
                 </div>
@@ -149,46 +180,82 @@ export default function CompanyDashboard() {
               </h3>
             </div>
             <ul className="divide-y divide-gray-200">
-              <li>
-                <div className="px-4 py-4 sm:px-6">
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm font-medium text-green-600 truncate">
-                      New crop listing available
-                    </p>
-                    <div className="ml-2 flex-shrink-0 flex">
-                      <p className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                        New
+              {stats.pendingBids > 0 ? (
+                <li>
+                  <div className="px-4 py-4 sm:px-6">
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm font-medium text-green-600 truncate">
+                        You have {stats.pendingBids} pending bid{stats.pendingBids > 1 ? 's' : ''}
                       </p>
+                      <div className="ml-2 flex-shrink-0 flex">
+                        <p className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                          Pending
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                  <div className="mt-2 sm:flex sm:justify-between">
-                    <div className="sm:flex">
+                    <div className="mt-2 sm:flex sm:justify-between">
                       <p className="flex items-center text-sm text-gray-500">
-                        <svg className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                        2 hours ago
-                      </p>
-                    </div>
-                    <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
-                      <svg className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      <p>
-                        Organic Wheat
+                        Waiting for farmers to respond
                       </p>
                     </div>
                   </div>
-                </div>
-              </li>
-              {/* Add more activity items as needed */}
+                </li>
+              ) : (
+                <li>
+                  <div className="px-4 py-4 sm:px-6">
+                    <p className="text-sm text-gray-500">No recent activity to show</p>
+                  </div>
+                </li>
+              )}
             </ul>
           </div>
         </div>
 
         {/* Quick Actions */}
         <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {/* Your buttons here */}
+          <Link
+            href="/dashboard/company/farms"
+            className="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-12 text-center hover:border-gray-400 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+          >
+            <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+            </svg>
+            <span className="mt-2 block text-sm font-medium text-gray-900">
+              Browse Farms
+            </span>
+            <span className="mt-1 block text-sm text-gray-500">
+              Find farms with available produce
+            </span>
+          </Link>
+
+          <Link
+            href="/dashboard/company/bids"
+            className="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-12 text-center hover:border-gray-400 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+          >
+            <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg>
+            <span className="mt-2 block text-sm font-medium text-gray-900">
+              Manage Bids
+            </span>
+            <span className="mt-1 block text-sm text-gray-500">
+              Track your bid status
+            </span>
+          </Link>
+
+          <div
+            className="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-12 text-center"
+          >
+            <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            <span className="mt-2 block text-sm font-medium text-gray-900">
+              Calendar View
+            </span>
+            <span className="mt-1 block text-sm text-gray-500">
+              Coming soon
+            </span>
+          </div>
         </div>
       </div>
     </div>

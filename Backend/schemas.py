@@ -1,7 +1,8 @@
 # schemas.py
 from pydantic import BaseModel, EmailStr
-from typing import Optional
-from models import UserType
+from typing import Optional, List
+from datetime import date, datetime
+from models import UserType, FarmStatusEnum, BidStatusEnum
 
 
 class Token(BaseModel):
@@ -63,3 +64,71 @@ class UserResponse(BaseModel):
 
 class UserInDB(UserResponse):
     hashed_password: str
+
+# Farm Schemas
+class FarmBase(BaseModel):
+    farm_location: str
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+    farm_area: float
+    crop_type: Optional[str] = None
+    is_organic: Optional[bool] = False
+    pesticides_used: Optional[str] = None
+    expected_harvest_date: Optional[date] = None
+    expected_quantity: Optional[float] = None
+    min_asking_price: Optional[float] = None
+    farm_status: Optional[FarmStatusEnum] = FarmStatusEnum.EMPTY
+
+class FarmCreate(FarmBase):
+    pass
+
+class FarmUpdate(BaseModel):
+    farm_location: Optional[str] = None
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+    farm_area: Optional[float] = None
+    crop_type: Optional[str] = None
+    is_organic: Optional[bool] = None
+    pesticides_used: Optional[str] = None
+    expected_harvest_date: Optional[date] = None
+    expected_quantity: Optional[float] = None
+    min_asking_price: Optional[float] = None
+    farm_status: Optional[FarmStatusEnum] = None
+
+class FarmResponse(FarmBase):
+    id: int
+    farmer_username: str
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+# Bid Schemas
+class BidBase(BaseModel):
+    farm_id: int
+    bid_amount: float
+
+class BidCreate(BidBase):
+    pass
+
+class BidUpdate(BaseModel):
+    bid_amount: Optional[float] = None
+    status: Optional[BidStatusEnum] = None
+
+class BidResponse(BidBase):
+    id: int
+    company_username: str
+    bid_date: datetime
+    status: BidStatusEnum
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+# Additional response schemas
+class FarmWithBidsResponse(FarmResponse):
+    bids: List[BidResponse] = []
+
+class BidWithFarmResponse(BidResponse):
+    farm: FarmResponse

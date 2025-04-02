@@ -6,31 +6,42 @@ const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
+  const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Initialize authentication state from localStorage
   useEffect(() => {
-    // Check if user is logged in on mount
-    checkAuth();
+    const storedToken = localStorage.getItem('token');
+    if (storedToken) {
+      setToken(storedToken);
+      fetchUserData(storedToken);
+    } else {
+      setLoading(false);
+    }
   }, []);
 
-  const checkAuth = async () => {
+  // Fetch user data using token
+  const fetchUserData = async (authToken) => {
     try {
-      const token = localStorage.getItem('token');
-      if (token) {
-        const response = await fetch('http://localhost:8000/users/me/', {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        if (response.ok) {
-          const userData = await response.json();
-          setUser(userData);
-        } else {
-          localStorage.removeItem('token');
+      const response = await fetch('http://localhost:8000/users/me', {
+        headers: {
+          'Authorization': `Bearer ${authToken}`,
+          'Content-Type': 'application/json'
         }
+      });
+      
+      if (response.ok) {
+        const userData = await response.json();
+        setUser(userData);
+      } else {
+        // Clear invalid token
+        localStorage.removeItem('token');
+        setToken(null);
       }
     } catch (error) {
-      console.error('Auth check failed:', error);
+      console.error('Error fetching user data:', error);
+      localStorage.removeItem('token');
+      setToken(null);
     } finally {
       setLoading(false);
     }
@@ -55,20 +66,15 @@ export function AuthProvider({ children }) {
       }
 
       const data = await response.json();
-      localStorage.setItem('token', data.access_token);
+      const authToken = data.access_token;
       
-      // Fetch user data
-      const userResponse = await fetch('http://localhost:8000/users/me/', {
-        headers: {
-          'Authorization': `Bearer ${data.access_token}`
-        }
-      });
+      // Save token to localStorage
+      localStorage.setItem('token', authToken);
+      setToken(authToken);
       
-      if (userResponse.ok) {
-        const userData = await userResponse.json();
-        setUser(userData);
-        return userData;
-      }
+      // Fetch user data with the new token
+      await fetchUserData(authToken);
+      return user;
     } catch (error) {
       console.error('Login failed:', error);
       throw error;
@@ -77,6 +83,7 @@ export function AuthProvider({ children }) {
 
   const logout = () => {
     localStorage.removeItem('token');
+    setToken(null);
     setUser(null);
   };
 
@@ -125,6 +132,7 @@ export function AuthProvider({ children }) {
   return (
     <AuthContext.Provider value={{
       user,
+      token,
       loading,
       login,
       logout,
