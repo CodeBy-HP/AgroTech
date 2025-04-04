@@ -59,6 +59,14 @@ class Farm(Base):
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
 
+class FarmImage(Base):
+    __tablename__ = "farm_images"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    farm_id = Column(Integer, ForeignKey("farms.id"), nullable=False)
+    image_url = Column(String, nullable=False)
+    created_at = Column(DateTime, server_default=func.now())
+
 class BidStatusEnum(str, enum.Enum):
     PENDING = "pending"
     ACCEPTED = "accepted"

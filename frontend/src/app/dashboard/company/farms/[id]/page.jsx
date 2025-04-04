@@ -6,6 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useFarm } from '@/context/FarmContext';
 import Link from 'next/link';
 import BidList from '@/components/bid/BidList';
+import ImageGallery from '@/components/farm/ImageGallery';
 import { formatDate, formatCurrency, formatFarmStatus } from '@/utils/formatters';
 
 export default function CompanyFarmDetailPage({ params }) {
@@ -154,6 +155,39 @@ export default function CompanyFarmDetailPage({ params }) {
             <h3 className="text-xl font-semibold text-gray-800">Farm Information</h3>
             <p className="mt-1 text-sm text-gray-500">Details and specifications of the farm.</p>
           </div>
+          
+          {/* Farm Images Section */}
+          {farm.images && farm.images.length > 0 ? (
+            <div className="px-6 py-5 sm:px-8 border-b border-gray-100">
+              <div className="flex items-center mb-4">
+                <svg className="h-5 w-5 text-green-500 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <h3 className="text-lg font-medium text-gray-900">Farm Images</h3>
+              </div>
+              <ImageGallery images={farm.images} />
+            </div>
+          ) : (
+            <div className="px-6 py-5 sm:px-8 border-b border-gray-100">
+              <div className="flex items-center mb-4">
+                <svg className="h-5 w-5 text-green-500 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <h3 className="text-lg font-medium text-gray-900">Farm Images</h3>
+              </div>
+              <div className="bg-gray-100 border border-gray-200 rounded-lg p-6 text-center">
+                <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                  <path 
+                    d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" 
+                    strokeWidth="2" 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                  />
+                </svg>
+                <p className="mt-2 text-sm text-gray-500">No images uploaded for this farm</p>
+              </div>
+            </div>
+          )}
           
           <div className="bg-white">
             <dl>

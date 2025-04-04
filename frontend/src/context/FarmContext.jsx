@@ -23,6 +23,28 @@ export function FarmProvider({ children }) {
     return token ? { 'Authorization': `Bearer ${token}` } : {};
   };
 
+  // Test authentication before making requests
+  const testAuth = async () => {
+    if (!token) {
+      console.error('No token available');
+      return false;
+    }
+
+    try {
+      const response = await axios.get(`${API_URL}/users/me/`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      console.log('Auth test successful:', response.status);
+      return true;
+    } catch (err) {
+      console.error('Auth test failed:', err.response?.status || err.message);
+      return false;
+    }
+  };
+
   // Farm functions
   const getFarms = async (filters = {}) => {
     try {
@@ -102,6 +124,13 @@ export function FarmProvider({ children }) {
         throw new Error('Authentication required');
       }
       
+      // Test authentication before proceeding
+      const isAuthenticated = await testAuth();
+      if (!isAuthenticated) {
+        setError('Authentication failed. Please log out and log in again.');
+        throw new Error('Authentication failed');
+      }
+      
       // Make the API request with token in header
       const headers = {
         'Authorization': `Bearer ${token}`,
@@ -109,6 +138,7 @@ export function FarmProvider({ children }) {
       };
       
       console.log('Creating farm - Token present:', !!token);
+      console.log('Auth header:', `Bearer ${token.substring(0, 10)}...`);
       
       const response = await axios.post(`${API_URL}/api/farms/`, farmData, { headers });
       
@@ -117,9 +147,90 @@ export function FarmProvider({ children }) {
       return response.data;
     } catch (err) {
       console.error('Create farm error:', err);
+      console.error('Token value:', token ? `${token.substring(0, 10)}...` : 'No token');
+      console.error('API URL:', API_URL);
       const errorMessage = 'Failed to create farm';
       setError(errorMessage);
       throw new Error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const uploadFarmImages = async (farmId, imageFiles) => {
+    try {
+      setLoading(true);
+      setError('');
+      
+      // Check if user is authenticated
+      if (!token) {
+        setError('Authentication required');
+        throw new Error('Authentication required');
+      }
+      
+      // Create form data for image upload
+      const formData = new FormData();
+      imageFiles.forEach(file => {
+        formData.append('images', file);
+      });
+      
+      // Make the API request with token in header
+      const headers = {
+        'Authorization': `Bearer ${token}`
+        // NOTE: Do not set Content-Type header for FormData, 
+        // axios will set it automatically with the correct boundary
+      };
+      
+      const response = await axios.post(
+        `${API_URL}/api/farms/${farmId}/images/`, 
+        formData, 
+        { headers }
+      );
+      
+      return response.data;
+    } catch (err) {
+      console.error('Upload farm images error:', err);
+      const errorMessage = 'Failed to upload farm images';
+      setError(errorMessage);
+      throw new Error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getFarmImages = async (farmId) => {
+    try {
+      setLoading(true);
+      setError('');
+      
+      const response = await axios.get(`${API_URL}/api/farms/${farmId}/images/`, {
+        headers: getAuthHeader()
+      });
+      
+      return response.data;
+    } catch (err) {
+      console.error('Get farm images error:', err);
+      setError('Failed to fetch farm images');
+      return []; // Return empty array instead of throwing
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const deleteFarmImage = async (imageId) => {
+    try {
+      setLoading(true);
+      setError('');
+      
+      await axios.delete(`${API_URL}/api/farms/images/${imageId}`, {
+        headers: getAuthHeader()
+      });
+      
+      return true;
+    } catch (err) {
+      console.error('Delete farm image error:', err);
+      setError('Failed to delete farm image');
+      return false; // Return false instead of throwing
     } finally {
       setLoading(false);
     }
@@ -249,10 +360,13 @@ export function FarmProvider({ children }) {
         throw new Error('Authentication required');
       }
       
-      const response = await axios.post(`${API_URL}/api/bids/`, bidData, {
-        headers: getAuthHeader()
-      });
+      // Make the API request with token in header
+      const headers = {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      };
       
+      const response = await axios.post(`${API_URL}/api/bids/`, bidData, { headers });
       return response.data;
     } catch (err) {
       console.error('Create bid error:', err);
@@ -300,7 +414,7 @@ export function FarmProvider({ children }) {
       setLoading(false);
     }
   };
-
+  
   const value = {
     farms,
     loading,
@@ -311,6 +425,9 @@ export function FarmProvider({ children }) {
     createFarm,
     updateFarm,
     deleteFarm,
+    uploadFarmImages,
+    getFarmImages,
+    deleteFarmImage,
     getBids,
     getMyBids,
     getBidById,
@@ -318,7 +435,7 @@ export function FarmProvider({ children }) {
     updateBid,
     deleteBid
   };
-
+  
   return (
     <FarmContext.Provider value={value}>
       {children}

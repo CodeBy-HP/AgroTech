@@ -3,6 +3,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 
 const AuthContext = createContext();
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -13,9 +14,11 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     const storedToken = localStorage.getItem('token');
     if (storedToken) {
+      console.log('Found stored token, first 10 chars:', storedToken.substring(0, 10));
       setToken(storedToken);
       fetchUserData(storedToken);
     } else {
+      console.log('No token found in localStorage');
       setLoading(false);
     }
   }, []);
@@ -23,7 +26,9 @@ export function AuthProvider({ children }) {
   // Fetch user data using token
   const fetchUserData = async (authToken) => {
     try {
-      const response = await fetch('http://localhost:8000/users/me', {
+      console.log('Fetching user data with token:', authToken.substring(0, 10) + '...');
+      
+      const response = await fetch(`${API_URL}/users/me/`, {
         headers: {
           'Authorization': `Bearer ${authToken}`,
           'Content-Type': 'application/json'
@@ -32,8 +37,10 @@ export function AuthProvider({ children }) {
       
       if (response.ok) {
         const userData = await response.json();
+        console.log('User data fetched successfully:', userData);
         setUser(userData);
       } else {
+        console.error('Failed to fetch user data, status:', response.status);
         // Clear invalid token
         localStorage.removeItem('token');
         setToken(null);
@@ -53,7 +60,9 @@ export function AuthProvider({ children }) {
       formData.append('username', username);
       formData.append('password', password);
 
-      const response = await fetch('http://localhost:8000/auth/token', {
+      console.log('Attempting login for user:', username);
+
+      const response = await fetch(`${API_URL}/auth/token`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
@@ -67,6 +76,8 @@ export function AuthProvider({ children }) {
 
       const data = await response.json();
       const authToken = data.access_token;
+      
+      console.log('Login successful, token received. First 10 chars:', authToken.substring(0, 10));
       
       // Save token to localStorage
       localStorage.setItem('token', authToken);
@@ -82,6 +93,7 @@ export function AuthProvider({ children }) {
   };
 
   const logout = () => {
+    console.log('Logging out, removing token');
     localStorage.removeItem('token');
     setToken(null);
     setUser(null);
@@ -89,7 +101,7 @@ export function AuthProvider({ children }) {
 
   const registerFarmer = async (userData) => {
     try {
-      const response = await fetch('http://localhost:8000/auth/register/farmer', {
+      const response = await fetch(`${API_URL}/auth/register/farmer`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -110,7 +122,7 @@ export function AuthProvider({ children }) {
 
   const registerCompany = async (userData) => {
     try {
-      const response = await fetch('http://localhost:8000/auth/register/company', {
+      const response = await fetch(`${API_URL}/auth/register/company`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

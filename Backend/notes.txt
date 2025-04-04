@@ -9,43 +9,51 @@ Authentication: OAuth2 & JWT
 More Tech for UI and all sort of things later -
 
 Our Solution
-B2B platform that:
-first important feature(to focus now) -> Connects farmers directly to companies for fair price deals, farmers could search there needed raw material on our website and then we will list the farmers that are looking for buyers to make UI nice we can show the farmers on a nice UI map where company can see the eligible farm lands . when comapany click the farmland we will show full information of the farmland like farmer name, farmland area, crop type , soil type, organic or not, expected harvesting date, contact etc. then company could place a deal for the farmer.
+ 1. Crop Disease Awareness Alert (Rule-Based + External API)
+How it works: Based on current weather conditions and crop type, alert farmers about potential diseases (e.g., “High risk of blight for potatoes due to humidity”).
 
-other features -> Uses predictive analytics to advise farmers on what to plant for maximum profit.
-other features -> Auto-matches farmers to government schemes they qualify for.
+Integration Plan:
 
+Use a public API like OpenWeatherMap or Weatherstack for current conditions.
 
-lets first talk about auth stuff -> 
+Add a rule-based engine in the backend (e.g., if crop == wheat and humidity > 70, raise alert).
 
-both farmer and company have to authenticate with our project.
+Show alerts on the Farm Detail Page or Farmer Dashboard.
 
-login page will be same.
-email and password.
+📈 2. Price Forecasting for Crops (Dashboard-only AI)
+How it works: Fetch historical and predicted prices from a source like Quandl, Agmarknet, or use dummy ML logic.
 
-register page will look like.
-for farmer -> 
-Full Name (string) – Required
-Mobile Number (string) – Required
-Email (string) – should be a valid email format
-Password (string) – Required, hashed before storing
-Farm Details
-Farm Location (string or GeoJSON) – Required, can be entered manually or pinned on a map
-Farm Area (float) – Required, in hectares or acres
-Government ID (string or file upload) – Optional
+Integration Plan:
 
-for company ->
-registration Page - Company
-Company Details
-Company Name (string) – Required
-Company Type (string) – Required (Dropdown: Food Processing, Exporter, Retailer, etc.)
-Location (string) – Required
+Create a backend route /api/forecast/prices/ which returns weekly/monthly predictions.
 
-Contact Person Details
-Full Name (string) – Required
-Designation (string) – Required (e.g., Procurement Manager, CEO, etc.)
-Email (string) – Required
-Mobile Number (string) – Required
-Company GST/Tax ID (string or file upload) – Optional
+Display as graphs on the dashboard, not farm-specific — keeps UI light and generic.
 
-once everything is done here we will look forward to implement other features later , first we have to consider this things will be good and working on both frontend and backend 
+🧠 3. AI-based Crop Suggestion System
+How it works: Suggest crops based on location, soil type, and current season.
+
+Integration Plan:
+
+Create a form or use existing farm data (like area, location, past crops).
+
+Backend runs a simple model (or hardcoded logic + data from ICAR or APIs).
+
+Show recommended crops when farmer adds or edits a farm.
+
+☀️ 4. Weather Prediction
+How it works: Show a 7-day weather forecast for the farm location.
+
+Integration Plan:
+
+Use OpenWeatherMap 7-day forecast API.
+
+Display on Farm Detail Page or Dashboard with minimal UI (cards or charts).
+
+🏛️ 5. Govt Scheme Suggester
+How it works: Suggest government schemes based on user type, location, and crop.
+
+Integration Plan:
+
+Hardcode scheme eligibility logic or scrape from PM-Kisan or MyGov.
+
+Add a section on the dashboard or profile with recommendations.

@@ -104,6 +104,21 @@ class FarmResponse(FarmBase):
     class Config:
         from_attributes = True
 
+# Farm Image Schemas
+class FarmImageBase(BaseModel):
+    farm_id: int
+    image_url: str
+
+class FarmImageCreate(FarmImageBase):
+    pass
+
+class FarmImageResponse(FarmImageBase):
+    id: int
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
 # Bid Schemas
 class BidBase(BaseModel):
     farm_id: int
@@ -132,3 +147,6 @@ class FarmWithBidsResponse(FarmResponse):
 
 class BidWithFarmResponse(BidResponse):
     farm: FarmResponse
+
+class FarmWithImagesResponse(FarmResponse):
+    images: List[FarmImageResponse] = []
