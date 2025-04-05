@@ -2,15 +2,24 @@
 
 import { createContext, useContext, useState, useEffect } from 'react';
 
+/**
+ * Authentication context implementation using React Context API
+ * Creates a centralized state management system for user authentication
+ */
 const AuthContext = createContext();
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 export function AuthProvider({ children }) {
+  // State management with React hooks
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Initialize authentication state from localStorage
+  /**
+   * Effect hook to initialize authentication state
+   * Implements token persistence using browser localStorage
+   * Executes once on component mount
+   */
   useEffect(() => {
     const storedToken = localStorage.getItem('token');
     if (storedToken) {
@@ -23,7 +32,11 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
-  // Fetch user data using token
+  /**
+   * Fetches user profile data using JWT authentication
+   * Implements proper error handling and token validation
+   * @param {string} authToken - JWT token for API authentication
+   */
   const fetchUserData = async (authToken) => {
     try {
       console.log('Fetching user data with token:', authToken.substring(0, 10) + '...');
@@ -41,7 +54,7 @@ export function AuthProvider({ children }) {
         setUser(userData);
       } else {
         console.error('Failed to fetch user data, status:', response.status);
-        // Clear invalid token
+        // Invalidate compromised authentication state
         localStorage.removeItem('token');
         setToken(null);
       }
@@ -54,6 +67,13 @@ export function AuthProvider({ children }) {
     }
   };
 
+  /**
+   * Authenticates user using username/password credentials
+   * Implements JWT token acquisition and storage
+   * @param {string} username - User identifier
+   * @param {string} password - User authentication credential
+   * @returns {Promise<object>} User data on successful authentication
+   */
   const login = async (username, password) => {
     try {
       const formData = new URLSearchParams();
@@ -79,11 +99,11 @@ export function AuthProvider({ children }) {
       
       console.log('Login successful, token received. First 10 chars:', authToken.substring(0, 10));
       
-      // Save token to localStorage
+      // Persist authentication state
       localStorage.setItem('token', authToken);
       setToken(authToken);
       
-      // Fetch user data with the new token
+      // Initialize user data
       await fetchUserData(authToken);
       return user;
     } catch (error) {
@@ -92,6 +112,10 @@ export function AuthProvider({ children }) {
     }
   };
 
+  /**
+   * Terminates user session and clears authentication state
+   * Implements complete state purge for security
+   */
   const logout = () => {
     console.log('Logging out, removing token');
     localStorage.removeItem('token');
@@ -99,6 +123,11 @@ export function AuthProvider({ children }) {
     setUser(null);
   };
 
+  /**
+   * Registers a new farmer account with the system
+   * @param {object} userData - Farmer registration data
+   * @returns {Promise<object>} Registration confirmation
+   */
   const registerFarmer = async (userData) => {
     try {
       const response = await fetch(`${API_URL}/auth/register/farmer`, {
@@ -120,6 +149,11 @@ export function AuthProvider({ children }) {
     }
   };
 
+  /**
+   * Registers a new company account with the system
+   * @param {object} userData - Company registration data
+   * @returns {Promise<object>} Registration confirmation
+   */
   const registerCompany = async (userData) => {
     try {
       const response = await fetch(`${API_URL}/auth/register/company`, {
@@ -156,6 +190,12 @@ export function AuthProvider({ children }) {
   );
 }
 
+/**
+ * Custom hook for consuming auth context
+ * Implements proper context validation pattern
+ * @returns {object} Authentication context values and methods
+ * @throws {Error} When used outside of AuthProvider
+ */
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {

@@ -35,7 +35,7 @@ export default function Home() {
           <div className="flex justify-center mb-12">
             <div className="inline-flex items-center rounded-full bg-gradient-to-r from-green-100 to-amber-100 px-6 py-2 border border-green-200">
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-amber-600 font-bold">
-                HACKATHON 2023 • REVOLUTIONARY AGRITECH
+                Made with ❤️ in Bhopal
               </span>
             </div>
           </div>
