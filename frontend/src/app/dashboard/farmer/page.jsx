@@ -341,6 +341,74 @@ export default function FarmerDashboard() {
               </div>
             )}
           </Link>
+
+          <Link
+            href="/dashboard/farmer/market-prices"
+            className="relative block w-full border-2 border-green-200 rounded-lg p-6 text-center hover:bg-green-50 hover:border-green-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200 shadow-sm hover:shadow-md"
+          >
+            <div className="inline-flex items-center justify-center w-12 h-12 mx-auto rounded-full bg-green-100">
+              <svg className="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
+              </svg>
+            </div>
+            <span className="mt-4 block text-lg font-medium text-gray-900">
+              Track Market Price
+            </span>
+            <span className="mt-1 block text-sm text-gray-500">
+              View latest commodity prices
+            </span>
+          </Link>
+
+          <Link
+            href="/dashboard/farmer/weather"
+            className="relative block w-full border-2 border-green-200 rounded-lg p-6 text-center hover:bg-green-50 hover:border-green-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200 shadow-sm hover:shadow-md"
+          >
+            <div className="inline-flex items-center justify-center w-12 h-12 mx-auto rounded-full bg-green-100">
+              <svg className="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
+              </svg>
+            </div>
+            <span className="mt-4 block text-lg font-medium text-gray-900">
+              Weather Forecast
+            </span>
+            <span className="mt-1 block text-sm text-gray-500">
+              Check weather conditions for your farms
+            </span>
+          </Link>
+
+          <Link
+            href="/dashboard/farmer/crop-health"
+            className="relative block w-full border-2 border-green-200 rounded-lg p-6 text-center hover:bg-green-50 hover:border-green-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200 shadow-sm hover:shadow-md"
+          >
+            <div className="inline-flex items-center justify-center w-12 h-12 mx-auto rounded-full bg-green-100">
+              <svg className="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l3-3 3 3m0 0l-3 3m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <span className="mt-4 block text-lg font-medium text-gray-900">
+              Crop Health Assistant
+            </span>
+            <span className="mt-1 block text-sm text-gray-500">
+              Identify diseases and get treatment recommendations
+            </span>
+          </Link>
+
+          <Link
+            href="/dashboard/farmer/schemes"
+            className="relative block w-full border-2 border-amber-200 rounded-lg p-6 text-center hover:bg-amber-50 hover:border-amber-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transition-all duration-200 shadow-sm hover:shadow-md"
+          >
+            <div className="inline-flex items-center justify-center w-12 h-12 mx-auto rounded-full bg-amber-100">
+              <svg className="h-6 w-6 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+            </div>
+            <span className="mt-4 block text-lg font-medium text-gray-900">
+              Government Schemes
+            </span>
+            <span className="mt-1 block text-sm text-gray-500">
+              Access government initiatives for farmers
+            </span>
+          </Link>
         </div>
       </div>
     </div>
