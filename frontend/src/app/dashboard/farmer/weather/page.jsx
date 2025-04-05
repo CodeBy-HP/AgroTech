@@ -6,8 +6,8 @@ import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
 import Image from 'next/image';
 
-// API key for OpenWeather
-const API_KEY = "760abec5657efe64d2dada9efb3f6fd1";
+// Get API key from environment variables
+const API_KEY = process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY;
 
 // Weather icons mapping
 const weatherIcons = {

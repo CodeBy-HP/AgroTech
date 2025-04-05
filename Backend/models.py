@@ -82,3 +82,26 @@ class Bid(Base):
     bid_date = Column(DateTime, server_default=func.now())
     status = Column(Enum(BidStatusEnum), default=BidStatusEnum.PENDING, nullable=False)
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
+
+class GovScheme(Base):
+    __tablename__ = "gov_schemes"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    scheme_name = Column(String, nullable=False)
+    detailed_description = Column(String, nullable=False)
+    type = Column(String, nullable=False)
+    url = Column(String, nullable=False)
+    created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
+
+class CropHealthRecord(Base):
+    __tablename__ = "crop_health_records"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    image_path = Column(String, nullable=False)
+    detected_disease = Column(String, nullable=True)
+    scientific_name = Column(String, nullable=True)
+    confidence_score = Column(Float, nullable=True)
+    timestamp = Column(DateTime, server_default=func.now())
+    notes = Column(String, nullable=True)

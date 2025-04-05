@@ -2,12 +2,20 @@ from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, File, 
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from sqlalchemy import or_
+import requests
+from fastapi.responses import JSONResponse
+import os
+from dotenv import load_dotenv
 
 from database import get_db
 from models import User, Farm, FarmImage, UserType, FarmStatusEnum
-from schemas import FarmCreate, FarmResponse, FarmUpdate, FarmWithBidsResponse, FarmImageResponse, FarmWithImagesResponse
+from schemas import FarmCreate, FarmResponse, FarmUpdate, FarmWithBidsResponse, FarmImageResponse, FarmWithImagesResponse, DiseaseIdentificationResponse
 from auth.auth_handler import get_current_active_user
 from utils import save_upload_file, delete_file
+
+# Load environment variables
+load_dotenv()
+KINDWISE_API_KEY = os.getenv("KINDWISE_API_KEY", "")
 
 router = APIRouter(prefix="/api", tags=["farms"])
 
@@ -241,4 +249,109 @@ async def get_my_farms(
         raise HTTPException(status_code=403, detail="Only farmers can access this endpoint")
     
     farms = db.query(Farm).filter(Farm.farmer_username == current_user.username).all()
-    return farms 
+    return farms
+
+# Crop Disease Identification endpoint
+@router.post("/identify-disease", response_model=DiseaseIdentificationResponse)
+async def identify_disease(image: UploadFile = File(...), current_user: User = Depends(get_current_active_user)):
+    identification_url = "https://crop.kindwise.com/api/v1/identification"
+    
+    files = {
+        "images": (image.filename, await image.read(), image.content_type)
+    }
+    data = {
+        "latitude": "0.0",
+        "longitude": "0.0",
+        "similar_images": "true"
+    }
+    headers = {
+        "Api-Key": KINDWISE_API_KEY
+    }
+
+    # Step 1: Identify Disease
+    post_response = requests.post(identification_url, headers=headers, data=data, files=files)
+    if post_response.status_code != 201:
+        raise HTTPException(status_code=500, detail="Failed to identify disease")
+
+    identification_result = post_response.json()
+    access_token = identification_result.get("access_token")
+
+    if not access_token:
+        raise HTTPException(status_code=500, detail="No access token received")
+
+    # Step 2: Get Treatment Details
+    details_url = f"https://crop.kindwise.com/api/v1/identification/{access_token}?details=treatment"
+    details_response = requests.get(details_url, headers=headers)
+    if details_response.status_code != 200:
+        raise HTTPException(status_code=500, detail="Failed to fetch treatment details")
+
+    treatment_details = details_response.json()
+    
+    # Step 3: Process Disease Suggestion
+    disease_suggestions = treatment_details["result"]["disease"]["suggestions"]
+    highest_disease = max(disease_suggestions, key=lambda x: x["probability"])
+    treatment_info = highest_disease.get("details", {}).get("treatment", {})
+
+    return {
+        "name": highest_disease["name"],
+        "scientific_name": highest_disease.get("scientific_name", "N/A"),
+        "probability": highest_disease["probability"],
+        "treatment": {
+            "prevention": treatment_info.get("prevention", []),
+            "chemical": treatment_info.get("chemical treatment", []),
+            "biological": treatment_info.get("biological treatment", [])
+        }
+    }
+
+# Standalone Crop Disease Identification endpoint - exact implementation from provided script
+@router.post("/crop-disease-identify", status_code=201)
+async def crop_disease_identify(image: UploadFile = File(...)):
+    """Identify crop diseases from images using KindWise API - no auth required for easy testing"""
+    identification_url = "https://crop.kindwise.com/api/v1/identification"
+    
+    files = {
+        "images": (image.filename, await image.read(), image.content_type)
+    }
+    data = {
+        "latitude": "0.0",
+        "longitude": "0.0",
+        "similar_images": "true"
+    }
+    headers = {
+        "Api-Key": KINDWISE_API_KEY
+    }
+
+    # Step 1: Identify Disease
+    post_response = requests.post(identification_url, headers=headers, data=data, files=files)
+    if post_response.status_code != 201:
+        return JSONResponse(content={"error": "Failed to identify disease"}, status_code=500)
+
+    identification_result = post_response.json()
+    access_token = identification_result.get("access_token")
+
+    if not access_token:
+        return JSONResponse(content={"error": "No access token received"}, status_code=500)
+
+    # Step 2: Get Treatment Details
+    details_url = f"https://crop.kindwise.com/api/v1/identification/{access_token}?details=treatment"
+    details_response = requests.get(details_url, headers=headers)
+    if details_response.status_code != 200:
+        return JSONResponse(content={"error": "Failed to fetch treatment details"}, status_code=500)
+
+    treatment_details = details_response.json()
+    
+    # Step 3: Process Disease Suggestion
+    disease_suggestions = treatment_details["result"]["disease"]["suggestions"]
+    highest_disease = max(disease_suggestions, key=lambda x: x["probability"])
+    treatment_info = highest_disease.get("details", {}).get("treatment", {})
+
+    return {
+        "name": highest_disease["name"],
+        "scientific_name": highest_disease.get("scientific_name", "N/A"),
+        "probability": highest_disease["probability"],
+        "treatment": {
+            "prevention": treatment_info.get("prevention", []),
+            "chemical": treatment_info.get("chemical treatment", []),
+            "biological": treatment_info.get("biological treatment", [])
+        }
+    } 

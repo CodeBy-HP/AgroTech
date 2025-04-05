@@ -150,3 +150,52 @@ class BidWithFarmResponse(BidResponse):
 
 class FarmWithImagesResponse(FarmResponse):
     images: List[FarmImageResponse] = []
+
+# Disease Identification Schemas
+class TreatmentInfo(BaseModel):
+    prevention: List[str] = []
+    chemical: List[str] = []
+    biological: List[str] = []
+
+class DiseaseIdentificationResponse(BaseModel):
+    name: str
+    scientific_name: str
+    probability: float
+    treatment: TreatmentInfo
+
+# Crop Health Record Schemas
+class CropHealthRecordBase(BaseModel):
+    user_id: int
+    image_path: str
+    detected_disease: Optional[str] = None
+    scientific_name: Optional[str] = None
+    confidence_score: Optional[float] = None
+    notes: Optional[str] = None
+
+class CropHealthRecordCreate(CropHealthRecordBase):
+    pass
+
+class CropHealthRecordResponse(CropHealthRecordBase):
+    id: int
+    timestamp: datetime
+
+    class Config:
+        from_attributes = True
+
+# Government Schemes Schemas
+class GovSchemeBase(BaseModel):
+    scheme_name: str
+    detailed_description: str
+    type: str
+    url: str
+
+class GovSchemeCreate(GovSchemeBase):
+    pass
+
+class GovSchemeResponse(GovSchemeBase):
+    id: int
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        orm_mode = True
